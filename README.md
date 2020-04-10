@@ -49,6 +49,7 @@ $ go build -o ortografia
 
 $ ./ortografia < testes/plutao.utf8.txt > saida.txt
 
-# Se você tem uma arquivo com a saída esperada:
+# Caso tenha um arquivo com a saída esperada:
 $ diff saida.txt esperado.txt
+
 ```
