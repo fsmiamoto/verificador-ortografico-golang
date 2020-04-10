@@ -4,6 +4,8 @@ Solução para o projeto [Verificador Ortográfico](http://wiki.inf.ufpr.br/mazi
 
 Em suma, as palavras não contidas em um dicionário fornecido devem ser marcadas com `[]` na saída.
 
+Os arquivos de teste foram convertidos para UTF-8
+
 ## Exemplo
 
 Entrada:
@@ -45,7 +47,7 @@ $ go test --bench .
 
 $ go build -o ortografia
 
-$ ./ortografia < testes/plutao.txt > saida.txt
+$ ./ortografia < testes/plutao.utf8.txt > saida.txt
 
 # Se você tem uma arquivo com a saída esperada:
 $ diff saida.txt esperado.txt
