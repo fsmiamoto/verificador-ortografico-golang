@@ -14,35 +14,32 @@ import (
 )
 
 const (
-	dictFileName = "brazilian.gz"
+	dictFileName = "brazilian.utf8.gz"
 )
 
 func main() {
-	dict := dictionary.New()
-
-	dictFile, err := os.Open(dictFileName)
+	f, err := os.Open(dictFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer dictFile.Close()
+	defer f.Close()
 
-	unzipedFile, err := gzip.NewReader(dictFile)
+	unziped, err := gzip.NewReader(f)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer unzipedFile.Close()
+	defer unziped.Close()
 
-	err = dict.Parse(unzipedFile)
+	dict, err := dictionary.New(unziped)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	r := VerificadorOrtografico(os.Stdin, dict)
-
-	fmt.Print(r)
+	result := VerificadorOrtografico(os.Stdin, dict)
+	fmt.Print(result)
 }
 
-func VerificadorOrtografico(r io.Reader, dict dictionary.Dictionary) io.Reader {
+func VerificadorOrtografico(r io.Reader, dict *dictionary.Dictionary) io.Reader {
 	scanner := bufio.NewScanner(r)
 	buffer := &bytes.Buffer{}
 

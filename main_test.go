@@ -10,13 +10,21 @@ import (
 	"github.com/fsmiamoto/verificador-ortografico-golang/pkg/dictionary"
 )
 
+var dict *dictionary.Dictionary
+
+type testState interface {
+	Fatalf(fmt string, args ...interface{})
+	Helper()
+}
+
 func TestVerificadorOrtografico(t *testing.T) {
-	dict := setupDict()
-	input, _ := os.Open("testes/exemplo.txt")
+	dict := setupDict(t)
+
+	input, _ := os.Open("testes/exemplo.utf8.txt")
 
 	got := VerificadorOrtografico(input, dict)
 
-	expect, _ := os.Open("testes/exemplo_esperado.txt")
+	expect, _ := os.Open("testes/exemplo_esperado.utf8.txt")
 	defer expect.Close()
 
 	assertEqualContent(t, got, expect)
@@ -25,8 +33,8 @@ func TestVerificadorOrtografico(t *testing.T) {
 func BenchmarkVerificadorOrtografico(b *testing.B) {
 	const n = 10
 
-	dict := setupDict()
-	input, _ := os.Open("test-inputs/brascubas.txt")
+	dict := setupDict(b)
+	input, _ := os.Open("test-inputs/brascubas.utf8.txt")
 
 	b.ResetTimer()
 	for i := 0; i < n; i++ {
@@ -34,13 +42,27 @@ func BenchmarkVerificadorOrtografico(b *testing.B) {
 	}
 }
 
-func setupDict() dictionary.Dictionary {
-	dictFile, _ := os.Open(dictFileName)
-	unziped, _ := gzip.NewReader(dictFile)
+func setupDict(t testState) *dictionary.Dictionary {
+	t.Helper()
 
-	dict := dictionary.New()
+	if dict != nil {
+		return dict
+	}
 
-	dict.Parse(unziped)
+	dictFile, err := os.Open(dictFileName)
+	if err != nil {
+		t.Fatalf("error: %v", err)
+	}
+
+	unziped, err := gzip.NewReader(dictFile)
+	if err != nil {
+		t.Fatalf("error: %v", err)
+	}
+
+	dict, err = dictionary.New(unziped)
+	if err != nil {
+		t.Fatalf("error: %v", err)
+	}
 
 	return dict
 }
