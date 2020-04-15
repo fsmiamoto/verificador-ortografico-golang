@@ -31,14 +31,36 @@ func TestVerificadorOrtografico(t *testing.T) {
 }
 
 func BenchmarkVerificadorOrtografico(b *testing.B) {
-	const n = 10
-
 	dict := setupDict(b)
-	input, _ := os.Open("test-inputs/brascubas.utf8.txt")
+
+	input, err := os.Open("testes/brascubas.utf8.txt")
+	if err != nil {
+		b.Fatalf("BenchmarkVerificadorOrtografico: %v", err)
+	}
+	defer input.Close()
 
 	b.ResetTimer()
-	for i := 0; i < n; i++ {
+
+	for i := 0; i < b.N; i++ {
 		VerificadorOrtografico(input, dict)
+		input.Seek(0, 0)
+	}
+}
+
+func BenchmarkVerificadorOrtograficoConcorrente(b *testing.B) {
+	dict := setupDict(b)
+
+	input, err := os.Open("testes/brascubas.utf8.txt")
+	if err != nil {
+		b.Fatalf("BenchmarkVerificadorOrtograficoConcorrente: %v", err)
+	}
+	defer input.Close()
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		VerificadorOrtograficoConcorrente(input, dict)
+		input.Seek(0, 0)
 	}
 }
 
